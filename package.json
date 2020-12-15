@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brianwlego/Learning-Node.git"
+    "url": "git+https://github.com/brianwlego/node-restAPI.git"
   },
   "author": "Brian Lego",
   "license": "ISC"
