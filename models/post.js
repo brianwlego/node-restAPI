@@ -5,7 +5,8 @@ const postSchema = new mongoose.Schema({
   imgUrl: String,
   content: String,
   creator: {
-    type: Object,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   }
 }, {timestamps: true});

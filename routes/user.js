@@ -1,5 +1,5 @@
 const express = require('express');
-const {body} = require('express-validator/check')
+const {body} = require('express-validator')
 
 const User = require('../models/user')
 
@@ -21,5 +21,7 @@ router.put('/signup', [
   body('password').trim().isLength({min: 5}),
   body('name').trim().not().isEmpty()
 ], userController.createUser);
+
+router.post('/login', userController.login)
 
 module.exports = router;

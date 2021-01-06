@@ -1,10 +1,11 @@
 const {validationResult} = require('express-validator')
 const Post = require('../models/post')
+const User = require('../models/user')
 
 
 //**  INDEX **//
 exports.indexPosts = (req, res, next) => {
-  Post.find()
+  Post.find().populate('creator')
     .then(posts => {
       res.status(200).json({
         posts: posts
@@ -48,18 +49,28 @@ exports.createPost = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  
   const post = new Post({
     title: req.body.title,
     content: req.body.content,
     imgUrl: '/images/book-img.jpeg',
-    creator: {name: 'Brian'}
+    creator: req.userId
   })
+  let creator;
   post.save()
-    .then(result => {
+    .then(() => {
+      return User.findById(req.userId);
+    })
+    .then(user => {
+      creator = user;
+      user.posts.push(post);
+      user.save();
+      return Post.findById(post._id).populate('creator')
+    })
+    .then((innerPost) => {
       res.status(201).json({
         message: 'Post created succesfully!',
-        post: result
+        post: innerPost,
+        creator: {_id: creator._id, name: creator.name}
       })
     })
     .catch(error => {
@@ -79,6 +90,10 @@ exports.updatePost = (req, res, next) => {
         const error = new Error('could not find post');
         error.statusCode = 404;
         throw error;
+      } else if (post.creator.toString() !== req.userId){
+        const err = new Error('Not authorized to change post')
+        err.statusCode = 403;
+        throw err;
       } else {
         post.title = req.body.title;
         post.content = req.body.content;
@@ -103,6 +118,10 @@ exports.deletePost = (req, res, next) => {
         const error = new Error('could not find post');
         error.statusCode = 404;
         throw error;
+      } else if (post.creator.toString() !== req.userId){
+        const err = new Error('Not authorized to change post')
+        err.statusCode = 403;
+        throw err;
       } else {
         return Post.findByIdAndRemove(req.params.id)
       }
