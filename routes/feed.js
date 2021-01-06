@@ -15,6 +15,7 @@ router.post('/post', [
 ], feedController.createPost)
 // UPDATE /feed/post/:id
 router.put('/post/:id', feedController.updatePost)
+router.delete('/post/:id', feedController.deletePost)
 
 
 module.exports = router;

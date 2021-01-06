@@ -95,3 +95,25 @@ exports.updatePost = (req, res, next) => {
       next(error);
     })
 }
+
+exports.deletePost = (req, res, next) => {
+  Post.findById(req.params.id)
+    .then(post => {
+      if (!post){
+        const error = new Error('could not find post');
+        error.statusCode = 404;
+        throw error;
+      } else {
+        return Post.findByIdAndRemove(req.params.id)
+      }
+    })
+    .then(() => {
+      res.status(200).json({
+        message: 'Post was deleted.'
+      })
+    })
+    .catch(error => {
+      if (!error.statusCode) error.statusCode = 500;
+      next(error);
+    })
+}

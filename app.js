@@ -8,6 +8,7 @@ require('dotenv').config()
 const app = express();
 
 const feedRoutes = require('./routes/feed')
+const userRoutes = require('./routes/user')
 
 app.use(bodyParser.json());
 app.use('/images', express.static(path.join(__dirname, 'images')))
@@ -20,12 +21,14 @@ app.use((req, res, next) => {
 })
 
 app.use('/feed', feedRoutes)
+app.use('/auth',userRoutes)
 
 app.use((error, req, res, next) => {
   console.log(error)
   const status = error.statusCode || 500;
   const message = error.message;
-  res.status(status).json({message: message})
+  const data = error.data
+  res.status(status).json({message: message, data: data})
 })
 
 
