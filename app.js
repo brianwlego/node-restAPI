@@ -37,6 +37,10 @@ mongoose.connect(`mongodb+srv://brian:${process.env.DBPASSWORD}@cluster0.11orq.m
   useUnifiedTopology: true
 }) 
   .then(()=> {
-    app.listen(8080)
+    const server = app.listen(8080);
+    const io = require('./socket').init(server)
+    io.on('connection', socket => {
+      console.log('client connected')
+    })
   })
   .catch(err=>console.log(err))

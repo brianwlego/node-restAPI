@@ -65,9 +65,7 @@ exports.createPost = async (req, res, next) => {
       creator: {_id: user._id, name: user.name}
     })
   } catch (error) {
-    if (!error.statusCode){
-      error.statusCode = 500;
-    }
+    if (!error.statusCode) error.statusCode = 500;
     next(error);
   }
 }
