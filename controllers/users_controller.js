@@ -20,7 +20,7 @@ exports.createUser = async (req, res, next) => {
       password: hashedPW
     })
     await user.save()
-    res.status(201).json({msg: "User created!", userId: result._id})
+    res.status(201).json({msg: "User created!", userId: user._id})
   } catch(error){
     if (!error.statusCode) error.statusCode = 500;
     next(error);

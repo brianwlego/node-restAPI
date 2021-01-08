@@ -8,7 +8,7 @@ const io = require('../socket')
 //**  INDEX **//
 exports.indexPosts = async (req, res, next) => {
   try {
-    const posts = await Post.find().populate('creator')
+    const posts = await Post.find().populate('creator').sort({createdAt: -1})
     res.status(200).json({
       posts: posts
     });
@@ -81,12 +81,12 @@ exports.createPost = async (req, res, next) => {
 //** EDIT **//
 exports.updatePost = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.id)
+    const post = await Post.findById(req.params.id).populate('creator')
     if (!post){
       const error = new Error('could not find post');
       error.statusCode = 404;
       throw error;
-    } else if (post.creator.toString() !== req.userId){
+    } else if (post.creator._id.toString() !== req.userId){
       const err = new Error('Not authorized to change post')
       err.statusCode = 403;
       throw err;
@@ -94,6 +94,7 @@ exports.updatePost = async (req, res, next) => {
       post.title = req.body.title;
       post.content = req.body.content;
       await post.save();
+      io.getIO().emit('posts', {action: 'update', post: post})
       res.status(200).json({ post: post })
     }
   } catch (error){
@@ -118,6 +119,7 @@ exports.deletePost = async (req, res, next) => {
       const user = await User.findById(req.userId)
       user.posts.pull(post._id)
       await user.save();
+      io.getIO().emit('posts', {action: 'delete', post: post._id})
       res.status(200).json({message: 'Post was deleted.'})
     }
   } catch (error){
